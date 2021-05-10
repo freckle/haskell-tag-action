@@ -1,0 +1,3 @@
+# Change this when you want CI to verify creating a new tag. Normally, we leave
+# it along and CI just verifies thing don't error in the "already exists" case.
+version: 0.0.0.0

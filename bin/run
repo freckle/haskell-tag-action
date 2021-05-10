@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+usage() {
+  cat <<'EOM'
+Usage: bin/run [-y PATH] [-p PREFIX] [v VERSION] [-Dh] <-r OWNER/NAME> <-c SHA>
+Options:
+  -r    Repository to operate on
+  -c    Commit to tag
+
+  -y    Path to package.yaml to read, default is ./package.yaml
+  -p    Prefix to apply to version to get tag, default is "v"
+  -v    Use given version, don't read package.yaml (useful for testing)
+
+  -D    Dry run; don't actually create tags (useful for testing)
+  -h    Show this help
+
+Environment variables:
+  GITHUB_TOKEN
+
+EOM
+}
+
+: "${GITHUB_TOKEN:=""}"
+
+repository=
+commit=
+
+package_yaml=./package.yaml
+tag_prefix=v
+version=
+
+dry_run=0
+
+while getopts r:c:y:p:v:Dh opt; do
+  case "$opt" in
+    r)
+      repository=$OPTARG
+      ;;
+    c)
+      commit=$OPTARG
+      ;;
+    y)
+      package_yaml=$OPTARG
+      ;;
+    p)
+      tag_prefix=$OPTARG
+      ;;
+    v)
+      version=$OPTARG
+      ;;
+    D)
+      dry_run=1
+      ;;
+    h)
+      usage
+      exit 0
+      ;;
+    \?)
+      usage >&2
+      exit 64
+      ;;
+  esac
+done
+
+shift $((OPTIND - 1))
+
+if [[ -z "$repository" ]]; then
+  echo "-r is required" >&2
+  usage >&2
+  exit 64
+fi
+
+if [[ -z "$commit" ]]; then
+  echo "-c is required" >&2
+  usage >&2
+  exit 64
+fi
+
+if [[ -z "$version" ]]; then
+  version=$(sed '/^version: *\([^ ]*\).*$/!d; s//\1/' "$package_yaml")
+fi
+
+if [[ -z "$version" ]]; then
+  echo "Unable to determine current version from $package_yaml" >&2
+  exit 1
+fi
+
+tag="$tag_prefix$version"
+
+gh_curl() {
+  local path="$1"
+  shift
+
+  # The test suite only queries and uses a public repo
+  if [[ -z "$GITHUB_TOKEN" ]]; then
+    curl \
+      --silent \
+      --fail \
+      --show-error \
+      --header "Accept: application/vnd.github.v3+json" \
+      --header "Content-type: application/vnd.github.v3+json" \
+      "$@" "https://api.github.com/repos/$repository$path"
+  else
+    curl \
+      --silent \
+      --fail \
+      --show-error \
+      --header "Accept: application/vnd.github.v3+json" \
+      --header "Content-type: application/vnd.github.v3+json" \
+      --header "Authorization: token $GITHUB_TOKEN" \
+      "$@" "https://api.github.com/repos/$repository$path"
+  fi
+}
+
+if gh_curl "/git/ref/tags/$tag" &>/dev/null; then
+  echo "Tag $tag exists in $repository already"
+  exit 0
+fi
+
+if ((dry_run)); then
+  echo "Would create $tag => $commit in $repository"
+  exit 0
+fi
+
+echo "Creating $tag => $commit in $repository"
+
+if [[ -z "$GITHUB_TOKEN" ]]; then
+  echo "Unable to create tag: GITHUB_TOKEN not set" >&2
+  exit 1
+fi
+
+gh_curl /git/tags --data @- <<EOM
+{
+  "tag":"$tag",
+  "message":"$tag",
+  "object":"$commit",
+  "type":"commit"
+}
+EOM
+
+gh_curl /git/refs --data @- <<EOM
+{
+  "ref":"refs/tags/$tag",
+  "sha":"$commit"
+}
+EOM
+
+echo "::set-output name=tag::$tag"
