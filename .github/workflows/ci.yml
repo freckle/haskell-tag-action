@@ -6,17 +6,20 @@ on:
     branches: main
 
 jobs:
-  runs-on: ubuntu-latest
-  steps:
-    test:
+  test:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
       - run: pip install cram
       - run: cram test/
 
-    action:
-      uses: ./
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        package-yaml: test/package.yaml
-        tag-prefix: example-
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          package-yaml: test/package.yaml
+          tag-prefix: example-
