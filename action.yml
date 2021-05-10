@@ -1,0 +1,26 @@
+name: Haskell tag
+description: Creates a tag based on Haskell package version, if missing
+inputs:
+  package-yaml:
+    description: "Path to package.yaml for reading version"
+    required: true
+    default: ./package.yaml
+  tag-prefix:
+    description: "Prefix for tags, default is v"
+    required: true
+    default: v
+outputs:
+  tag:
+    description: "Tag, if one was created"
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        ${{ github.action_path }}/bin/run \
+          -y "${{ inputs.package-yaml }}" \
+          -p "${{ inputs.tag-prefix }}" \
+          -r "${{ github.repository }}" \
+          -c "${{ github.sha }}"
