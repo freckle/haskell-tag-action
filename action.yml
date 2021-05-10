@@ -1,9 +1,6 @@
 name: Haskell tag
 description: Creates a tag based on Haskell package version, if missing
 inputs:
-  github-token:
-    description: "GitHub token, typically ${{ secrets.GITHUB_TOKEN }}"
-    required: true
   package-yaml:
     description: "Path to package.yaml for reading version"
     required: true
@@ -22,7 +19,6 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        export GITHUB_TOKEN=${{ inputs.github-token }}
         ${{ github.action_path }}/bin/run \
           -y "${{ inputs.package-yaml }}" \
           -p "${{ inputs.tag-prefix }}" \

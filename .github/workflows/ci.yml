@@ -20,6 +20,5 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           package-yaml: test/package.yaml
           tag-prefix: example-
