@@ -49,7 +49,8 @@ Often, projects will automate this by using [Semantic Commits][]. As changes
 land in `main`, commit message conventions determine how large of a version bump
 to make, and then automation creates an appropriate release at that version.
 
-[semantic commits]: https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716
+[semantic commits]:
+  https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716
 
 This just doesn't work for us. Instead, we want to control versions and releases
 more collaboratively, via step (1) above. This Action represents our current
