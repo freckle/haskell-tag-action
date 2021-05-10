@@ -21,6 +21,8 @@ Environment variables:
 EOM
 }
 
+: "${GITHUB_TOKEN:=""}"
+
 repository=
 commit=
 
@@ -94,12 +96,16 @@ gh_curl() {
   if [[ -z "$GITHUB_TOKEN" ]]; then
     curl \
       --silent \
+      --fail \
+      --show-error \
       --header "Accept: application/vnd.github.v3+json" \
       --header "Content-type: application/vnd.github.v3+json" \
       "$@" "https://api.github.com/repos/$repository$path"
   else
     curl \
       --silent \
+      --fail \
+      --show-error \
       --header "Accept: application/vnd.github.v3+json" \
       --header "Content-type: application/vnd.github.v3+json" \
       --header "Authorization: token $GITHUB_TOKEN" \
@@ -107,22 +113,7 @@ gh_curl() {
   fi
 }
 
-tag_exists() {
-  local http_code
-
-  http_code=$(gh_curl "/git/ref/tags/$tag" -o /dev/null -w "%{http_code}")
-
-  case "$http_code" in
-    200) return 0 ;;
-    404) return 1 ;;
-    *)
-      echo "Expected 200 or 404, received $http_code" >&2
-      exit 1
-      ;;
-  esac
-}
-
-if tag_exists; then
+if gh_curl "/git/ref/tags/$tag" &>/dev/null; then
   echo "Tag $tag exists in $repository already"
   exit 0
 fi
@@ -139,7 +130,7 @@ if [[ -z "$GITHUB_TOKEN" ]]; then
   exit 1
 fi
 
-gh_curl /git/tags --silent --fail --show-error --data @- <<EOM
+gh_curl /git/tags --data @- <<EOM
 {
   "tag":"$tag",
   "message":"$tag",
@@ -148,7 +139,7 @@ gh_curl /git/tags --silent --fail --show-error --data @- <<EOM
 }
 EOM
 
-gh_curl /git/refs --silent --fail --show-error --data @- <<EOM
+gh_curl /git/refs --data @- <<EOM
 {
   "ref":"refs/tags/$tag",
   "sha":"$commit"

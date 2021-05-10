@@ -19,10 +19,3 @@ Reads package.yaml regardless of whitespace, or comments
   $ echo 'version:  1.0.2.2   # foo' > "$CRAMTMP"/package.yaml
   > $TESTDIR/../bin/run -D -r freckle/faktory_worker_haskell -c abc123 -y "$CRAMTMP"/package.yaml
   Tag v1.0.2.2 exists in freckle/faktory_worker_haskell already
-
-Handles API errors
-
-  $ GITHUB_TOKEN=x
-  > $TESTDIR/../bin/run -D -r something/i-cant-access -c abc123 -v 9.9.9.9
-  Expected 200 or 404, received 401
-  [1]
