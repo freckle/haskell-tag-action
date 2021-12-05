@@ -8,8 +8,6 @@ such as [uploading to Hackage][stack-upload-action].
 
 ## Usage
 
-## Examples
-
 ```yaml
 - uses: freckle/haskell-tag-action@v1
   env:
@@ -17,6 +15,8 @@ such as [uploading to Hackage][stack-upload-action].
 ```
 
 If a tag is created, it'll be found in `outputs.tag`.
+
+## Examples
 
 ### Publishing a Hackage Package
 
