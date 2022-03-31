@@ -16,13 +16,16 @@ outputs:
 runs:
   using: composite
   steps:
+    - id: prep
+      uses: mikefarah/yq@master
+      with:
+        cmd: yq '.version' '${{ inputs.package-yaml }}'
+
     - id: run
       name: Run
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
       run: |
         ${{ github.action_path }}/bin/run \
-          -y "${{ inputs.package-yaml }}" \
-          -p "${{ inputs.tag-prefix }}" \
           -r "${{ github.repository }}" \
-          -c "${{ github.sha }}"
+          -c "${{ github.sha }}" \
+          -t "${{ inputs.tag-prefix }}${{ steps.prep.outputs.result }}"

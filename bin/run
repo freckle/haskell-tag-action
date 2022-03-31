@@ -3,14 +3,11 @@ set -eou pipefail
 
 usage() {
   cat <<'EOM'
-Usage: bin/run [-y PATH] [-p PREFIX] [v VERSION] [-Dh] <-r OWNER/NAME> <-c SHA>
+Usage: bin/run [-Dh] <-r OWNER/NAME> <-c SHA> <-t TAG>
 Options:
   -r    Repository to operate on
   -c    Commit to tag
-
-  -y    Path to package.yaml to read, default is ./package.yaml
-  -p    Prefix to apply to version to get tag, default is "v"
-  -v    Use given version, don't read package.yaml (useful for testing)
+  -t    Tag to create (if doesn't exist)
 
   -D    Dry run; don't actually create tags (useful for testing)
   -h    Show this help
@@ -26,13 +23,11 @@ EOM
 repository=
 commit=
 
-package_yaml=./package.yaml
-tag_prefix=v
-version=
+tag=
 
 dry_run=0
 
-while getopts r:c:y:p:v:Dh opt; do
+while getopts r:c:t:Dh opt; do
   case "$opt" in
     r)
       repository=$OPTARG
@@ -40,14 +35,8 @@ while getopts r:c:y:p:v:Dh opt; do
     c)
       commit=$OPTARG
       ;;
-    y)
-      package_yaml=$OPTARG
-      ;;
-    p)
-      tag_prefix=$OPTARG
-      ;;
-    v)
-      version=$OPTARG
+    t)
+      tag=$OPTARG
       ;;
     D)
       dry_run=1
@@ -77,16 +66,11 @@ if [[ -z "$commit" ]]; then
   exit 64
 fi
 
-if [[ -z "$version" ]]; then
-  version=$(sed '/^version: *\([^ ]*\).*$/!d; s//\1/' "$package_yaml")
+if [[ -t "$tag" ]]; then
+  echo "-t is required" >&2
+  usage >&2
+  exit 64
 fi
-
-if [[ -z "$version" ]]; then
-  echo "Unable to determine current version from $package_yaml" >&2
-  exit 1
-fi
-
-tag="$tag_prefix$version"
 
 gh_curl() {
   local path="$1"
