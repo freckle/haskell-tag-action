@@ -13,6 +13,9 @@ outputs:
   tag:
     description: "Tag, if one was created"
     value: ${{ steps.run.outputs.tag }}
+  version:
+    description: "Version read from package-yaml"
+    value: ${{ steps.prep.outputs.result }}
 runs:
   using: composite
   steps:

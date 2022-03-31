@@ -18,9 +18,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: tag
         uses: ./
         with:
           package-yaml: test/package.yaml
           tag-prefix: example-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: expected
+        run: |
+          # Naive parse on our controlled test file
+          version=$(sed -E '/^version: (.*)$/!d; s//\1/' test/package.yaml)
+          echo "::set-output name=version::$version"
+          echo "::set-output name=tag::v$version"
+
+      - name: Assertions on outputs.version
+        run: |
+          if [[ "${{ steps.tag.outputs.version }}" != "${{ steps.expected.outputs.version }}" ]]; then
+            echo "Version did not parse correctly" >&2
+            exit 1
+          fi
+
+      - if: ${{ steps.tag.outputs.tag }}
+        name: Assertions on outputs.tag
+        run: |
+          if [[ "${{ steps.tag.outputs.tag }}" != "${{ steps.expected.outputs.tag }}" ]]; then
+            echo "Tag was not prefixed correctly" >&2
+            exit 1
+          fi
