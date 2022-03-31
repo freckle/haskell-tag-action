@@ -18,9 +18,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: tag
         uses: ./
         with:
           package-yaml: test/package.yaml
           tag-prefix: example-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: ${{ steps.tag.outputs.tag }}
+        name: "Run if example created a tag"
+        run: echo "tag output: ${{ steps.tag.outputs.tag }}"
+
+      - if: ${{ ! steps.tag.outputs.tag }}
+        name: "Run if example did not create a tag"
+        run: echo "tag output: ${{ steps.tag.outputs.tag }}"
