@@ -23,8 +23,6 @@ jobs:
         with:
           package-yaml: test/package.yaml
           tag-prefix: example-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - id: expected
         run: |
