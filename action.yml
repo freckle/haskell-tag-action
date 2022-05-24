@@ -9,6 +9,10 @@ inputs:
     description: "Prefix for tags, default is v"
     required: true
     default: v
+  github-token:
+    description: "Override GitHub token, if necessary"
+    required: true
+    default: "${{ github.token }}"
 outputs:
   tag:
     description: "Tag, if one was created"
@@ -28,6 +32,10 @@ runs:
       name: Run
       shell: bash
       run: |
+        if [[ -z "$GITHUB_TOKEN" ]]; then
+          export GITHUB_TOKEN=${{ inputs.github-token }}
+        fi
+
         ${{ github.action_path }}/bin/run \
           -r "${{ github.repository }}" \
           -c "${{ github.sha }}" \
