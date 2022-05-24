@@ -112,10 +112,8 @@ compromise.
 
 ## Caveats
 
-To simplify this Action we do the following:
-
-1. Expect `package.yaml` and do not support reading `*.cabal` directly
-1. Read `version: ` naively (via `sed`)
+To simplify this Action, we expect `package.yaml` and do not support reading
+`*.cabal` directly.
 
 PRs welcome (Including rewriting in a Real Language :tm:).
 
