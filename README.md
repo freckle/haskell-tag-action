@@ -10,8 +10,6 @@ such as [uploading to Hackage][stack-upload-action].
 
 ```yaml
 - uses: freckle/haskell-tag-action@v1
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 If a tag is created, it'll be found in `outputs.tag`.
@@ -27,8 +25,6 @@ jobs:
     steps:
       - id: tag
         uses: freckle/haskell-tag-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
 
@@ -52,8 +48,6 @@ jobs:
     steps:
       - id: tag
         uses: freckle/haskell-tag-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
 
