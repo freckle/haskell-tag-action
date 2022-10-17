@@ -130,4 +130,4 @@ gh_curl /git/refs --data @- <<EOM
 }
 EOM
 
-echo "::set-output name=tag::$tag"
+echo "tag=$tag"

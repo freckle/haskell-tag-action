@@ -39,4 +39,5 @@ runs:
         ${{ github.action_path }}/bin/run \
           -r "${{ github.repository }}" \
           -c "${{ github.sha }}" \
-          -t "${{ inputs.tag-prefix }}${{ steps.prep.outputs.result }}"
+          -t "${{ inputs.tag-prefix }}${{ steps.prep.outputs.result }}" \
+          >>"$GITHUB_OUTPUT"
