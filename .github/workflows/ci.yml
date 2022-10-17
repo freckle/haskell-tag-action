@@ -28,8 +28,10 @@ jobs:
         run: |
           # Naive parse on our controlled test file
           version=$(sed -E '/^version: (.*)$/!d; s//\1/' test/package.yaml)
-          echo "::set-output name=version::$version"
-          echo "::set-output name=tag::v$version"
+          cat >> "$GITHUB_OUTPUT" <<EOM
+          version=$version
+          tag=v$version
+          EOM
 
       - name: Assertions on outputs.version
         run: |
