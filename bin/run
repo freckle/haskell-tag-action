@@ -98,16 +98,16 @@ gh_curl() {
 }
 
 if gh_curl "/git/ref/tags/$tag" &>/dev/null; then
-  echo "Tag $tag exists in $repository already"
+  echo "Tag $tag exists in $repository already" >&2
   exit 0
 fi
 
 if ((dry_run)); then
-  echo "Would create $tag => $commit in $repository"
+  echo "Would create $tag => $commit in $repository" >&2
   exit 0
 fi
 
-echo "Creating $tag => $commit in $repository"
+echo "Creating $tag => $commit in $repository" >&2
 
 if [[ -z "$GITHUB_TOKEN" ]]; then
   echo "Unable to create tag: GITHUB_TOKEN not set" >&2
