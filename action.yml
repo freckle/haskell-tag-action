@@ -32,12 +32,25 @@ runs:
       name: Run
       shell: bash
       run: |
-        if [[ -z "$GITHUB_TOKEN" ]]; then
-          export GITHUB_TOKEN=${{ inputs.github-token }}
+        if gh api "/repos/{owner}/{repo}/ref/tags/$TAG" &>/dev/null; then
+          echo "Tag $TAG exists already"
+          exit 0
         fi
 
-        ${{ github.action_path }}/bin/run \
-          -r "${{ github.repository }}" \
-          -c "${{ github.sha }}" \
-          -t "${{ inputs.tag-prefix }}${{ steps.prep.outputs.result }}" \
-          >>"$GITHUB_OUTPUT"
+        gh api '/repos/{owner}/{repo}/git/tags' \
+          --method POST \
+          --raw-field "tag=$TAG" \
+          --raw-field "message=$TAG" \
+          --raw-field "object=$SHA" \
+          --raw-field "type=commit"
+
+        gh api '/repos/{owner}/{repo}/git/tags' \
+          --method POST \
+          --raw-field "ref=refs/tag/$TAG" \
+          --raw-field "sha=$SHA"
+
+        echo "tag=$TAG" >>"$GITHUB_OUTPUT"
+      env:
+        SHA: ${{ github.sha }}
+        TAG: ${{ inputs.tag-prefix }}${{ steps.prep.outputs.result }}
+        GH_TOKEN: ${{ inputs.github-token }}
