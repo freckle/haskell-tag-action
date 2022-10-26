@@ -22,7 +22,7 @@ jobs:
           version=$(sed -E '/^version: (.*)$/!d; s//\1/' test/package.yaml)
           cat >> "$GITHUB_OUTPUT" <<EOM
           version=$version
-          tag=v$version
+          tag=example-$version
           EOM
 
       - name: Assertions on outputs.version
