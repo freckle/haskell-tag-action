@@ -44,7 +44,7 @@ runs:
           --raw-field "object=$SHA" \
           --raw-field "type=commit"
 
-        gh api '/repos/{owner}/{repo}/git/tags' \
+        gh api '/repos/{owner}/{repo}/git/refs' \
           --method POST \
           --raw-field "ref=refs/tag/$TAG" \
           --raw-field "sha=$SHA"
