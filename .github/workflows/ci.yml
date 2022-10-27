@@ -39,3 +39,10 @@ jobs:
             echo "Tag was not prefixed correctly" >&2
             exit 1
           fi
+
+      # If we created a tag, run again to verify the already-exists logic
+      - if: ${{ steps.tag.outputs.tag }}
+        uses: ./
+        with:
+          package-yaml: test/package.yaml
+          tag-prefix: example-

@@ -32,7 +32,7 @@ runs:
       name: Run
       shell: bash
       run: |
-        if gh api "/repos/{owner}/{repo}/ref/tags/$TAG" &>/dev/null; then
+        if gh api "/repos/{owner}/{repo}/git/ref/tags/$TAG" &>/dev/null; then
           echo "Tag $TAG exists already"
           exit 0
         fi
@@ -46,7 +46,7 @@ runs:
 
         gh api '/repos/{owner}/{repo}/git/refs' \
           --method POST \
-          --raw-field "ref=refs/tag/$TAG" \
+          --raw-field "ref=refs/tags/$TAG" \
           --raw-field "sha=$SHA"
 
         echo "tag=$TAG" >>"$GITHUB_OUTPUT"
