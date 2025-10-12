@@ -24,7 +24,7 @@ runs:
   using: composite
   steps:
     - id: prep
-      uses: mikefarah/yq@v4.47.2
+      uses: mikefarah/yq@v4.48.1
       with:
         cmd: yq eval '.version' '${{ inputs.package-yaml }}'
 
